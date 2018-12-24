@@ -17,8 +17,10 @@ void accionesAgenteSeguridad(int sig);
 
 int main(int argc, char *argv[]){
 
-printf("hoola");
-printf("hey");
+	printf("hoola");
+	printf("hey");
+	printf("dj");
+
 
 }
 
