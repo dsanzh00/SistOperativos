@@ -1,26 +1,39 @@
-# include <stdio.h>
-# include <stdlib.h>
-# include <sys/wait.h>
-# include <signal.h>
-# include <unistd.h>
-# include <sys/types.h>
-# include <errno.h>
-# include <time.h>
-# include <signal.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/wait.h>
+#include<signal.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<errno.h>
+#include<time.h>
+#include<signal.h>
+//#include<pthreads.h>
 
 void nuevoUsuario(int sig);
 void accionesUsuario(int sig);
 void accionesFacturador(int sig);
 void accionesAgenteSeguridad(int sig);
 
+//declaraciones globales
+//mutex y variables de condicion
+//lista de 10 usuarios (id facturado atendido tipo
+//usuario en control 
+FILE *parchivo;
+
 
 
 int main(int argc, char *argv[]){
 
-	printf("hoola");
-	printf("hey");
-	printf("dj");
+	parchivo=fopen("log.txt","r,w,a");
 
+	if(parchivo==NULL){
+
+		fprintf(stderr,"ha ocurrido un error al abrir el archivo");
+		exit(EXIT_FAILURE);
+
+	}
+
+	
 
 }
 
