@@ -63,8 +63,8 @@ struct usuario us [USUARIOS];
 
 int main(int argc, char *argv[]){
 
-	inicializalog();
-	inicializarmutex();
+	inicializaLog();
+	inicializaMutex();
 
 }
 
