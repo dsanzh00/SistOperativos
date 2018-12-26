@@ -22,6 +22,10 @@ void accionesAgenteSeguridad(int sig);
 void inicializaLog();
 void inicializaMutex();
 void inicializaGlobales();
+void inicializaLog();
+void inicializaMutex();
+void WriteLogMessage(char *id, char *msg);
+
 
 //Declaraciones globales
 int contUsuariosNormal; //Número de usuarios normales que han pasado
@@ -32,9 +36,6 @@ int totalEmbarcados; //Numero de usuarios que han embarcado
 int sigint; //Variable para saber si acabamos el prg o aun quedan usuarios por comprobar
 int idAtendido; //Guarda el ID del ultimo usuario que ha sido atendido
 int atendido; // Indica si hay algun usuario para ser atendido 
-void inicializalog();
-void inicializarmutex();
-void WriteLogMessage(char *id, char *msg);
 
 
 //lista de 10 usuarios (id facturado atendido tipo
