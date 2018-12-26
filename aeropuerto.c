@@ -1,12 +1,18 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
+#include<unistd.h>
+#include<errno.h> 
 #include<sys/wait.h>
 #include<signal.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<errno.h>
+#include<pthread.h>
 #include<time.h>
+#include<sys/types.h>
+#include<sys/syscall.h>
 #include<signal.h>
+#include<ctype.h>
+#include<string.h>
+#define USUARIOS 10
 //#include<pthreads.h>
 
 void nuevoUsuario(int sig);
@@ -22,7 +28,15 @@ void inicializalog();
 FILE *logFile;
 char *logFileName="log.txt";
 
-
+struct usuario{
+	int id; //id del usuario
+	int facturado;
+	int atendido;
+	int tipo;
+	pthread_t usuario;
+};
+//Array de los atletas
+struct usuario us [USUARIOS];
 
 int main(int argc, char *argv[]){
 
