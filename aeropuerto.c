@@ -21,6 +21,7 @@ void accionesFacturador(int sig);
 void accionesAgenteSeguridad(int sig);
 void inicializalog();
 void inicializarmutex();
+void WriteLogMessage(char *id, char *msg);
 
 //declaraciones globales
 //mutex y variables de condicion
@@ -73,6 +74,7 @@ void nuevoUsuario(int sig){
 
 */
 
+
 }
 
 void accionesUsuario(int sig){
@@ -124,4 +126,16 @@ void inicializarmutex(){
 	if(pthread_mutex_init(&mTipo,NULL)!=0){
 		exit(-1);
 	}
+}
+
+void WriteLogMessage(char *id, char *msg){
+
+	time_t now =time(0);
+	struct tm *tlocal = localtime(&now);
+	char stnow[19];
+	strftime(stnow,19, "%d/%m/ %y %H:%M:%S", tlocal);
+	logFile = fopen(logFileName, "a");
+	fprintf(logFile,"[%s] %s: %s\n", stnow, id,msg);
+	fclose(logFile);
+
 }
