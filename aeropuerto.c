@@ -19,11 +19,20 @@ void nuevoUsuario(int sig);
 void accionesUsuario(int sig);
 void accionesFacturador(int sig);
 void accionesAgenteSeguridad(int sig);
-void inicializalog();
-void inicializarmutex();
+void inicializaLog();
+void inicializaMutex();
+void inicializaGlobales();
 
-//declaraciones globales
-//mutex y variables de condicion
+//Declaraciones globales
+int contUsuariosNormal; //Número de usuarios normales que han pasado
+int contUsuariosVip; // Número de usuarios Vip que han pasado
+int totalUsuarios; //numero total de usuarios normales y vip que han pasado
+int admite; // A ver si acepta mas usuarios
+int totalEmbarcados; //Numero de usuarios que han embarcado
+int sigint; //Variable para saber si acabamos el prg o aun quedan usuarios por comprobar
+int idAtendido; //Guarda el ID del ultimo usuario que ha sido atendido
+int atendido; // Indica si hay algun usuario para ser atendido 
+
 //lista de 10 usuarios (id facturado atendido tipo
 //usuario en control 
 FILE *logFile;
@@ -101,7 +110,7 @@ void accionesAgenteSeguridad(int sig){
 
 }
 
-void inicializalog(){
+void inicializaLog(){
 
 	logFile=fopen(logFileName,"w");
 	
@@ -110,7 +119,7 @@ void inicializalog(){
 	writeLogMessage("Sistema", "Log iniciado.");
 
 }
-void inicializarmutex(){
+void inicializaMutex(){
 
 	if(pthread_mutex_init(&mId,NULL)!=0){
 		exit(-1);
@@ -124,4 +133,17 @@ void inicializarmutex(){
 	if(pthread_mutex_init(&mTipo,NULL)!=0){
 		exit(-1);
 	}
+}
+
+void inicializaGlobales(){
+
+	admite=1;
+	contUsuariosNormales=0;
+	contUsuariosVip=0;
+	atendido=0;
+	idAtendido=0;
+	totalUsuarios=0;
+	sigint=0;
+	totalEmbarcados=0;
+
 }
