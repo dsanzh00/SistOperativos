@@ -171,4 +171,7 @@ void inicializarUsuarios(){
 		us[i].atendido=0;
 		us[i].tipo=0;
 	}
+
+	//aqui falta algo
+
 }
