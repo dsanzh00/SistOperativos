@@ -32,17 +32,19 @@ char *logFileName="log.txt";
 
 //Mutex
 
-	pthread_mutex_t mId;
-	pthread_mutex_t mFacturado;
-	pthread_mutex_t mAtendido;
-	pthread_mutex_t mTipo;
+pthread_mutex_t mId;
+pthread_mutex_t mFacturado;
+pthread_mutex_t mAtendido;
+pthread_mutex_t mTipo;
 
 struct usuario{
+
 	int id; //id del usuario
 	int facturado;
 	int atendido;
 	int tipo;
 	pthread_t usuario;
+
 };
 //Array de los atletas
 struct usuario us [USUARIOS];
@@ -109,6 +111,7 @@ void inicializalog(){
 
 }
 void inicializarmutex(){
+
 	if(pthread_mutex_init(&mId,NULL)!=0){
 		exit(-1);
 	}
