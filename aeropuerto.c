@@ -13,27 +13,20 @@ void nuevoUsuario(int sig);
 void accionesUsuario(int sig);
 void accionesFacturador(int sig);
 void accionesAgenteSeguridad(int sig);
+void inicializalog();
 
 //declaraciones globales
 //mutex y variables de condicion
 //lista de 10 usuarios (id facturado atendido tipo
 //usuario en control 
-FILE *parchivo;
+FILE *logFile;
+char *logFileName="log.txt";
 
 
 
 int main(int argc, char *argv[]){
 
-	parchivo=fopen("log.txt","r,w,a");
-
-	if(parchivo==NULL){
-
-		fprintf(stderr,"ha ocurrido un error al abrir el archivo");
-		exit(EXIT_FAILURE);
-
-	}
-
-	
+	inicializalog();
 
 }
 
@@ -79,5 +72,15 @@ void accionesFacturador(int sig){
 }
 
 void accionesAgenteSeguridad(int sig){
+
+}
+
+void inicializalog(){
+
+	logFile=fopen(logFileName,"w");
+	
+	fclose(logfile);
+
+	writeLogMessage("Sistema", "Log iniciado.");
 
 }
