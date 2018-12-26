@@ -20,6 +20,7 @@ void accionesUsuario(int sig);
 void accionesFacturador(int sig);
 void accionesAgenteSeguridad(int sig);
 void inicializalog();
+void inicializarmutex();
 
 //declaraciones globales
 //mutex y variables de condicion
@@ -27,6 +28,14 @@ void inicializalog();
 //usuario en control 
 FILE *logFile;
 char *logFileName="log.txt";
+
+
+//Mutex
+
+	pthread_mutex_t mId;
+	pthread_mutex_t mFacturado;
+	pthread_mutex_t mAtendido;
+	pthread_mutex_t mTipo;
 
 struct usuario{
 	int id; //id del usuario
@@ -41,6 +50,7 @@ struct usuario us [USUARIOS];
 int main(int argc, char *argv[]){
 
 	inicializalog();
+	inicializarmutex();
 
 }
 
@@ -97,4 +107,18 @@ void inicializalog(){
 
 	writeLogMessage("Sistema", "Log iniciado.");
 
+}
+void inicializarmutex(){
+	if(pthread_mutex_init(&mId,NULL)!=0){
+		exit(-1);
+	}
+	if(pthread_mutex_init(&mFacturado,NULL)!=0){
+		exit(-1);
+	}
+	if(pthread_mutex_init(&mAtendido,NULL)!=0){
+		exit(-1);
+	}
+	if(pthread_mutex_init(&mTipo,NULL)!=0){
+		exit(-1);
+	}
 }
