@@ -29,13 +29,13 @@ void WriteLogMessage(char *id, char *msg);
 
 
 //Declaraciones globales
-int contUsuarios; // Número de usuarios Vip que han pasado
-int totalUsuarios; //numero total de usuarios normales y vip que han pasado
-int admite; // A ver si acepta mas usuarios
-int totalAtendidos; //Numero de usuarios que han sido atendidos
-int sigint; //Variable para saber si acabamos el prg o aun quedan usuarios por comprobar
-int idAtendido; //Guarda el ID del ultimo usuario que ha sido atendido
-int atendido; // Indica si hay algun usuario para ser atendido 
+int contUsuarios; 		// Numero de usuarios que han pasado
+int totalUsuarios;		// Numero total de usuarios normales y vip que han pasado
+int admite; 			// A ver si acepta mas usuarios
+int totalAtendidos; 		// Numero de usuarios que han sido atendidos
+int sigint; 			// Variable para saber si acabamos el prg o aun quedan usuarios por comprobar
+int idAtendido; 		// Guarda el ID del ultimo usuario que ha sido atendido
+int atendido;			// Indica si hay algun usuario para ser atendido 
 
 
 //lista de 10 usuarios (id facturado atendido tipo
@@ -55,10 +55,11 @@ pthread_mutex_t mTipo;
 struct usuario{
 
 	int id; //id del usuario
-	int facturado;
-	int cola;
-	int atendido;
 	int tipo;
+	int cola;	
+	int atendido;	
+	int facturado;
+
 	pthread_t usuario;
 
 };
@@ -128,7 +129,65 @@ void nuevoUsuario(int sig){
 
 }
 
-void accionesUsuario(int sig){
+void *accionesUsuario(void* posicion){
+
+	int aleatorio, i, pos;
+		pos = contUsuarios;
+	int id = us[pos].id
+	contUsuarios++;
+
+	/* Mientras no han sido atendidos comprobamos (cada 3 seg) si necesitan ir al baño y se van */
+
+	while(us[pos].atendido == 0){
+		aleatorio = rand()%100;
+		if(aleatorio  < 10){
+	
+		/* Si el numero pertenece al 10% ese usuario abandona la cola porque se va al baño y lo registramos en el log */
+
+			pthread_mutex_lock(&mEscritura);
+			us[pos].atendido = 2;
+			char id1[20];
+			char msg1[200];
+			sprintf(id1, "El usuario_%d ", id);
+			sprintf(msg1, "se va de la cola porque necesita ir al baño");
+			writeLogMessage(id1, msg1);
+			pthread_mutex_unlock(&mEscritura);
+			contUsuarios--;
+			matamosHilo(pos);
+		}else{	
+		
+			pthread_mutex_unlock(&mAtendido);
+			sleep(3);
+		}
+	
+	pthread_mutex_lock(&mAtendido);
+	for(i=0; i<USUARIOS; i++){
+		if(us[i].id == id){
+			pos = i;
+		}
+	}
+
+	} // Cerramos el while
+
+	while(us[pos].atendido == 1){
+		pthread_mutex_unlock(&mAtendido);
+		pthread_mutex_lock(&mAtendido);
+	
+		for(i=0; i<USUARIOS; i++){
+			if(us[i].id == id){
+				pos = i;
+			}	
+		}
+	}
+
+	if(us[pos].facturado == 1){
+		/* Mandamos al usuario a control de seguridad */
+		control(us[pos].id);
+	}else{
+		matamosHilo(pos);
+	}
+
+
 /*
 
 1. Guarda en el log la hora de entrada
