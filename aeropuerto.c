@@ -13,7 +13,7 @@
 #include<ctype.h>
 #include<string.h>
 #define USUARIOS 10
-#define COLAS 2
+#define COLA 1
 //#include<pthreads.h>
 
 void nuevoUsuario(int sig);
@@ -32,7 +32,7 @@ void WriteLogMessage(char *id, char *msg);
 int contUsuarios; // Número de usuarios Vip que han pasado
 int totalUsuarios; //numero total de usuarios normales y vip que han pasado
 int admite; // A ver si acepta mas usuarios
-int totalEmbarcados; //Numero de usuarios que han embarcado
+int totalAtendidos; //Numero de usuarios que han sido atendidos
 int sigint; //Variable para saber si acabamos el prg o aun quedan usuarios por comprobar
 int idAtendido; //Guarda el ID del ultimo usuario que ha sido atendido
 int atendido; // Indica si hay algun usuario para ser atendido 
