@@ -19,6 +19,7 @@
 void nuevoUsuario(int sig);
 void accionesUsuario(int sig);
 void matamosHilo(int posicion);
+void control(int id);
 void accionesFacturador(int sig);
 void accionesAgenteSeguridad(int sig);
 void inicializaLog();
@@ -33,9 +34,11 @@ int contUsuarios; 		// Numero de usuarios que han pasado
 int totalUsuarios;		// Numero total de usuarios normales y vip que han pasado
 int admite; 			// A ver si acepta mas usuarios
 int totalAtendidos; 		// Numero de usuarios que han sido atendidos
+int controlSeguridad		// Usuarios que llegan al control de seguridad
+int idControl			// Guarda ID del ultimo en el control 
+int totalEmbarcados; 		// Numero de usuarios que han embarcado
 int sigint; 			// Variable para saber si acabamos el prg o aun quedan usuarios por comprobar
-int idAtendido; 		// Guarda el ID del ultimo usuario que ha sido atendido
-int atendido;			// Indica si hay algun usuario para ser atendido 
+
 
 
 //lista de 10 usuarios (id facturado atendido tipo
@@ -63,8 +66,10 @@ struct usuario{
 	pthread_t usuario;
 
 };
+
 //Array de los atletas
 struct usuario us [USUARIOS];
+
 
 int main(int argc, char *argv[]){
 
@@ -143,6 +148,7 @@ void *accionesUsuario(void* posicion){
 		if(aleatorio  < 10){
 	
 		/* Si el numero pertenece al 10% ese usuario abandona la cola porque se va al baño y lo registramos en el log */
+		/* ¿Habrá que repetir para los que se cansan? */	
 
 			pthread_mutex_lock(&mEscritura);
 			us[pos].atendido = 2;
@@ -167,7 +173,7 @@ void *accionesUsuario(void* posicion){
 		}
 	}
 
-	} // Cerramos el while
+	} // Se acaba el while
 
 	while(us[pos].atendido == 1){
 		pthread_mutex_unlock(&mAtendido);
@@ -184,6 +190,7 @@ void *accionesUsuario(void* posicion){
 		/* Mandamos al usuario a control de seguridad */
 		control(us[pos].id);
 	}else{
+		/* Ha fallado el visado y te piras*/
 		matamosHilo(pos);
 	}
 
@@ -227,6 +234,26 @@ void matamosHilo(int posicion){
 	pthread_mutex_unlock(&mAtendido);
 	pthread_exit(NULL);
 
+}
+
+void control(int id){
+	int i;
+	
+	/* Si no hay nadie en el control, entra */
+	if(controlSeguridad == 0){
+		controlSeguridad = 1;
+		idControl = id;
+	}else{
+		/* Si el control está ocupado */
+		pthread_mutex_lock(&mEscritura);
+		char a[100];
+		char msg[200];
+		sprintf(a, "El usuario_%d ", id);
+		sprintf(msg, "esta esperando a que el usuario_%d acabe", idControl);
+		writeLogMessage(a, msg);
+		pthread_mutex_unlock(&mEscritura);
+		idControl = id;
+	}
 }
 
 void accionesFacturador(int sig){
