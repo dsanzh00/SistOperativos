@@ -205,6 +205,7 @@ void inicializarUsuarios(){
 	for(i=0;i<USUARIOS;i++){
 		us[i].id=0;
 		us[i].facturado=0;
+		us[i].cola=0;
 		us[i].atendido=0;
 		us[i].tipo=0;
 	}
