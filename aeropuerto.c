@@ -18,11 +18,13 @@
 
 void nuevoUsuario(int sig);
 void accionesUsuario(int sig);
+void matamosHilo(int posicion);
 void accionesFacturador(int sig);
 void accionesAgenteSeguridad(int sig);
 void inicializaLog();
 void inicializaMutex();
 void inicializaGlobales();
+void inicializarUsuarios();
 void WriteLogMessage(char *id, char *msg);
 
 
@@ -100,10 +102,9 @@ void nuevoUsuario(int sig){
 
 		pthread_mutex_lock(&mEscritura);
 		char id[20];
-		sprintf(id, "El usuario %d ", us[contUsuarios].id);
-		sprintf(msg, "entra en la cola %d", us[contUsuarios].cola);
+		sprintf(id, "El usuario %d entra en la cola", us[contUsuarios].id);
 		writeLogMessage(id);
-		pthread_mutex_unlock(&mEscritura);
+		pthread_mutex_lock(&mEscritura);
 		// creación del hilo del usuario
 		pthread_create(&us[contUsuarios].usuario, NULL, accionesUsuario, NULL);
 	}
@@ -142,6 +143,30 @@ void accionesUsuario(int sig){
 			te puede joder el visado y que te piras. 
 
 */
+
+}
+
+void matamosHilo(int posicion){
+
+	int i;
+
+	for(i=posicion; i<USUARIOS-1; i++){
+		us[i].id = us[i+1].id;
+		us[i].facturado = us[i+1].facturado;
+		us[i].cola = us[i+1].cola;
+		us[i].atendido = us[i+1].atendido;
+		us[i].tipo = us[i+1].tipo;
+	}
+
+	us[USUARIOS-1].id = 0;
+	us[USUARIOS-1].facturado = 0;
+	us[USUARIOS-1].cola = 0;
+	us[USUARIOS-1].atendido = 0;
+	us[USUARIOS-1].tipo = 0;	
+
+	totalAtendidos++;
+	pthread_mutex_unlock(&mAtendido);
+	pthread_exit(NULL);
 
 }
 
@@ -206,7 +231,6 @@ void inicializarUsuarios(){
 	for(i=0;i<USUARIOS;i++){
 		us[i].id=0;
 		us[i].facturado=0;
-		us[i].cola=0;
 		us[i].atendido=0;
 		us[i].tipo=0;
 	}
