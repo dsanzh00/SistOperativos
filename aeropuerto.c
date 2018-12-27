@@ -13,6 +13,7 @@
 #include<ctype.h>
 #include<string.h>
 #define USUARIOS 10
+#define COLAS 2
 //#include<pthreads.h>
 
 void nuevoUsuario(int sig);
@@ -26,8 +27,7 @@ void WriteLogMessage(char *id, char *msg);
 
 
 //Declaraciones globales
-int contUsuariosNormal; //Número de usuarios normales que han pasado
-int contUsuariosVip; // Número de usuarios Vip que han pasado
+int contUsuarios; // Número de usuarios Vip que han pasado
 int totalUsuarios; //numero total de usuarios normales y vip que han pasado
 int admite; // A ver si acepta mas usuarios
 int totalEmbarcados; //Numero de usuarios que han embarcado
@@ -46,6 +46,7 @@ char *logFileName="log.txt";
 
 pthread_mutex_t mId;
 pthread_mutex_t mFacturado;
+pthread_mutex_t mEscritura;
 pthread_mutex_t mAtendido;
 pthread_mutex_t mTipo;
 
@@ -53,6 +54,7 @@ struct usuario{
 
 	int id; //id del usuario
 	int facturado;
+	int cola;
 	int atendido;
 	int tipo;
 	pthread_t usuario;
@@ -63,12 +65,48 @@ struct usuario us [USUARIOS];
 
 int main(int argc, char *argv[]){
 
+	if(signal(SIGUSR1, nuevoUsuario) == SIG_ERR){
+		perror("Error en el envío de la señal SIGUSR1");
+	}
+
+	if(signal(SIGUSR2, nuevoUsuario) == SIG_ERR){
+		perror("Error en el envío de la señal SIGUSR2");
+	}
+
+
 	inicializaLog();
 	inicializaMutex();
 
 }
 
 void nuevoUsuario(int sig){
+
+	if(signal(SIGUSR1, nuevoUsuario) == SIG_ERR){
+		exit(0);
+	}
+
+	if(signal(SIGUSR2, nuevoUsuario) == SIG_ERR){
+		exit(0);
+	}
+
+	if(contUsuarios<USUARIOS && sigint==0){
+
+		pthread_mutex_lock(&mAtendido);
+		totalUsuarios++;
+		us[contUsuarios].id = totalUsuarios;
+		if(USUARIOS){
+			us[contUsuarios].cola = 1; 
+		}
+
+		pthread_mutex_lock(&mEscritura);
+		char id[20];
+		sprintf(id, "El usuario %d entra en la cola", us[contUsuarios].id);
+		writeLogMessage(id);
+		pthread_mutex_lock(&mEscritura);
+		// creación del hilo del usuario
+		pthread_create(&us[contUsuarios].usuario, NULL, accionesUsuario, NULL);
+	}
+
 
 /*
 1. Comprobar si hay espacio en la lista de facturación
@@ -143,8 +181,7 @@ void inicializaMutex(){
 void inicializaGlobales(){
 
 	admite=1;
-	contUsuariosNormales=0;
-	contUsuariosVip=0;
+	contUsuario=0;
 	atendido=0;
 	idAtendido=0;
 	totalUsuarios=0;
