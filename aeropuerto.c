@@ -104,7 +104,7 @@ void nuevoUsuario(int sig){
 		us[contUsuarios].id = totalUsuarios;
 		if(USUARIOS){
 			us[contUsuarios].cola = 1; 
-		}
+		} //esta parte hay que mirarla bien.
 
 		pthread_mutex_lock(&mEscritura);
 		char id[20];
@@ -137,14 +137,16 @@ void nuevoUsuario(int sig){
 void *accionesUsuario(void* posicion){
 
 	int aleatorio, i, pos;
-		pos = contUsuarios;
+	pos = contUsuarios;
 	int id = us[pos].id
 	contUsuarios++;
 
 	/* Mientras no han sido atendidos comprobamos (cada 3 seg) si necesitan ir al baño y se van */
 
 	while(us[pos].atendido == 0){
+
 		aleatorio = rand()%100;
+
 		if(aleatorio  < 10){
 	
 		/* Si el numero pertenece al 10% ese usuario abandona la cola porque se va al baño y lo registramos en el log */
@@ -217,6 +219,7 @@ void matamosHilo(int posicion){
 	int i;
 
 	for(i=posicion; i<USUARIOS-1; i++){
+
 		us[i].id = us[i+1].id;
 		us[i].facturado = us[i+1].facturado;
 		us[i].cola = us[i+1].cola;
