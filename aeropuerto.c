@@ -301,6 +301,12 @@ void *accionesFacturador(void* numfact){
 	pthread_mutex_lock(&mEscritura);
 
 	char in[10];
+	sprintf(in, "%d", facturadores);
+	writeLogMessage("Se ha montado la mesa de facturacion %d", in);
+	pthread_mutex_unlock(&mEscritura);
+	while(admite==1){
+
+	}
 }
 
 void accionesAgenteSeguridad(int sig){
