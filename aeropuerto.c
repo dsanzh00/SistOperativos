@@ -131,13 +131,15 @@ void nuevoUsuario(int sig){
 		pthread_mutex_lock(&mAtendido);
 		totalUsuarios++;
 		us[contUsuarios].id = totalUsuarios;
-		if(USUARIOS){
-			us[contUsuarios].cola = 1; 
-		} //esta parte hay que mirarla bien.
-
+		if(sig=SIGUSR1){
+			us[contUsuarios].cola = 1; //El usuario es asignado a la cola normal
+		}
+		else{
+			us[contUsuarios].cola = 2; //El usuario es asignado a la cola vip
+		}
 		pthread_mutex_lock(&mEscritura);
 		char id[20];
-		sprintf(id, "El usuario %d entra en la cola", us[contUsuarios].id);
+		sprintf(id, "El usuario %d entra en la cola %d", us[contUsuarios].id, us[contUsuarios].cola);
 		writeLogMessage(id);
 		pthread_mutex_lock(&mEscritura);
 		// creación del hilo del usuario
