@@ -295,7 +295,12 @@ void *accionesFacturador(void* numfact){
 
 	int facturadores = *(int *) numfact +1; //sirve para saber que facturador es
 	
+	int contador1 =0;
+	int contador2=0;
 
+	pthread_mutex_lock(&mEscritura);
+
+	char in[10];
 }
 
 void accionesAgenteSeguridad(int sig){
