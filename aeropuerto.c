@@ -290,6 +290,9 @@ void control(int id){
 
 void *accionesFacturador(void* numfact){
 
+	int facturadores = *(int *) numfactm +1 //sirve para saber que facturador es
+	
+
 }
 
 void accionesAgenteSeguridad(int sig){
@@ -356,7 +359,7 @@ void inicializarUsuarios(){
 	//aqui falta algo
 
 }
-void finPrograma(){
+void finPrograma(int sig){
 
 	if(signal(SIGINT, finPrograma)==SIG_ERR){
 
