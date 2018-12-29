@@ -91,7 +91,7 @@ int main(int argc, char *argv[]){
 			perror("Error en el envio de la senial SIGUSR2");
 			exit(-1);
 		}
-		if(signal(SIGINT, finPograma) == SIG_ERR){
+		if(signal(SIGINT, finPrograma) == SIG_ERR){
 			perror("Error en el envio de la senial SIGINT");
 			exit(-1);
 		}
@@ -354,5 +354,14 @@ void inicializarUsuarios(){
 	}
 
 	//aqui falta algo
+
+}
+void finPrograma(){
+
+	if(signal(SIGINT, finPrograma)==SIG_ERR){
+
+		exit(-1);		
+	
+	}	
 
 }
