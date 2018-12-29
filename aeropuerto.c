@@ -38,6 +38,7 @@ int controlSeguridad		// Usuarios que llegan al control de seguridad
 int idControl			// Guarda ID del ultimo en el control 
 int totalEmbarcados; 		// Numero de usuarios que han embarcado
 int sigint; 			// Variable para saber si acabamos el prg o aun quedan usuarios por comprobar
+int cabinasfact;
 
 
 
@@ -72,18 +73,46 @@ struct usuario us [USUARIOS];
 
 
 int main(int argc, char *argv[]){
-
-	if(signal(SIGUSR1, nuevoUsuario) == SIG_ERR){
-		perror("Error en el envío de la señal SIGUSR1");
+	srand(time(NULL));
+	if(argc>2){
+		exit(0);
 	}
+	else{
+		cabinasfact=2;
+		if(argc>1){
+			cabinasfact=atoi(argv[1]);
+		}
+		if(signal(SIGUSR1, nuevoUsuario) == SIG_ERR){//señal para un usuario no vip
+			perror("Error en el envio de la senial SIGUSR1");
+			exit(-1);
+		}
 
-	if(signal(SIGUSR2, nuevoUsuario) == SIG_ERR){
-		perror("Error en el envío de la señal SIGUSR2");
+		if(signal(SIGUSR2, nuevoUsuario) == SIG_ERR){//señal para un usuario vip
+			perror("Error en el envio de la senial SIGUSR2");
+			exit(-1);
+		}
+		if(signal(SIGINT, finPograma) == SIG_ERR){
+			perror("Error en el envio de la senial SIGINT");
+			exit(-1);
+		}
+		inicializaMutex();
+		inicializaGlobales();
+		inicializaUsuarios();
+		inicializaLog();
+		//vamos a crear las mesas de facturacion
+		int i;
+		for(i=0;i<cabinasfact;i++){
+			//Creamos los hilos
+			pthread_t facturadoes;
+			pthread_create(&facturadores,NULL,accionesFacturador,(void *)&i);
+			sleep(1);
+		}		
+		//Bucle para que coja seniales infinitamente
+		while(1){
+			pause();
+		}
+		return 0;
 	}
-
-
-	inicializaLog();
-	inicializaMutex();
 
 }
 
@@ -259,7 +288,7 @@ void control(int id){
 	}
 }
 
-void accionesFacturador(int sig){
+void *accionesFacturador(void* numfact){
 
 }
 
