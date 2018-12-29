@@ -17,7 +17,7 @@
 //#include<pthreads.h>
 
 void nuevoUsuario(int sig);
-void accionesUsuario(int sig);
+void *accionesUsuario(void* posicion);
 void matamosHilo(int posicion);
 void control(int id);
 void *accionesFacturador(void* numfact);
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
 		//vamos a crear las mesas de facturacion
 		int i;
 			//Creamos los hilos
-			for(i=0; i<USUARIOS; i++){
+			for(i=0; i<cabinasfact; i++){
 			pthread_t facturadores;
 			pthread_create(&facturadores,NULL,accionesFacturador,(void *)&i);
 			sleep(1);
@@ -170,7 +170,7 @@ void *accionesUsuario(void* posicion){
 
 	int aleatorio, i, pos;
 	pos = contUsuarios;
-	int id = us[pos].id
+	int id = us[pos].id;
 	contUsuarios++;
 
 	/* Mientras no han sido atendidos comprobamos (cada 3 seg) si necesitan ir al baño y se van */
@@ -332,8 +332,9 @@ void inicializaGlobales(){
 
 	admite=1;
 	contUsuarios=0;
-	atendido=0;
-	idAtendido=0;
+	totalAtendidos=0;
+	controlSeguridad=0;
+	idControl=0;
 	totalUsuarios=0;
 	sigint=0;
 	totalEmbarcados=0;
