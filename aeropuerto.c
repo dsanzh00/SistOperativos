@@ -103,6 +103,7 @@ int main(int argc, char *argv[]){
 		//vamos a crear las mesas de facturacion
 		int i;
 			//Creamos los hilos
+			for(i=0; i<USUARIOS; i++){
 			pthread_t facturadores;
 			pthread_create(&facturadores,NULL,accionesFacturador,(void *)&i);
 			sleep(1);
@@ -292,7 +293,7 @@ void control(int id){
 
 void *accionesFacturador(void* numfact){
 
-	int facturadores = *(int *) numfactm +1 //sirve para saber que facturador es
+	int facturadores = *(int *) numfact +1; //sirve para saber que facturador es
 	
 
 }
@@ -305,7 +306,7 @@ void inicializaLog(){
 
 	logFile=fopen(logFileName,"w");
 	
-	fclose(logfile);
+	fclose(logFile);
 
 	writeLogMessage("Sistema", "Log iniciado.");
 
@@ -330,7 +331,7 @@ void inicializaMutex(){
 void inicializaGlobales(){
 
 	admite=1;
-	contUsuario=0;
+	contUsuarios=0;
 	atendido=0;
 	idAtendido=0;
 	totalUsuarios=0;
