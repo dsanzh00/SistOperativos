@@ -20,13 +20,14 @@ void nuevoUsuario(int sig);
 void accionesUsuario(int sig);
 void matamosHilo(int posicion);
 void control(int id);
-void accionesFacturador(int sig);
+void *accionesFacturador(void* numfact);
 void accionesAgenteSeguridad(int sig);
 void inicializaLog();
 void inicializaMutex();
 void inicializaGlobales();
 void inicializarUsuarios();
 void WriteLogMessage(char *id, char *msg);
+void finPrograma(int sig);
 
 
 //Declaraciones globales
@@ -34,8 +35,8 @@ int contUsuarios; 		// Numero de usuarios que han pasado
 int totalUsuarios;		// Numero total de usuarios normales y vip que han pasado
 int admite; 			// A ver si acepta mas usuarios
 int totalAtendidos; 		// Numero de usuarios que han sido atendidos
-int controlSeguridad		// Usuarios que llegan al control de seguridad
-int idControl			// Guarda ID del ultimo en el control 
+int controlSeguridad;		// Usuarios que llegan al control de seguridad
+int idControl;			// Guarda ID del ultimo en el control 
 int totalEmbarcados; 		// Numero de usuarios que han embarcado
 int sigint; 			// Variable para saber si acabamos el prg o aun quedan usuarios por comprobar
 int cabinasfact;
@@ -101,9 +102,8 @@ int main(int argc, char *argv[]){
 		inicializaLog();
 		//vamos a crear las mesas de facturacion
 		int i;
-		for(i=0;i<cabinasfact;i++){
 			//Creamos los hilos
-			pthread_t facturadoes;
+			pthread_t facturadores;
 			pthread_create(&facturadores,NULL,accionesFacturador,(void *)&i);
 			sleep(1);
 		}		
