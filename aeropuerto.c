@@ -28,7 +28,7 @@ void inicializaGlobales();
 void inicializarUsuarios();
 void WriteLogMessage(char *id, char *msg);
 void finPrograma(int sig);
-
+void visadoincorrecto(int usuario_id);
 
 //Declaraciones globales
 int contUsuarios; 		// Numero de usuarios que han pasado
@@ -308,6 +308,26 @@ void *accionesFacturador(void* numfact){
 	while(admite==1){
 
 	}
+}
+
+void visadoincorrecto(int usuario_id){
+
+		if(aleatorio>=90){
+			facturacion=2;
+			dormir=rand()%(10-6+1)+6;
+			sleep(dormir);//el usuario espera un 	aleatorio entre 6 y 10 
+
+			//Registro en el log
+			pthread_mutex_lock(&mEscritura);
+			char id[30];
+			char msg[150];
+			sprintf(id, "Usuario %d ", usuario_id);
+			sprintf(msg, "No ha podido facturar por tener el visado incorrecto, y ha tardado %d segundos", dormir);
+			writeLogMessage(id, msg);
+			pthread_mutex_unlock(&mEscritura);
+			
+		}
+
 }
 
 void accionesAgenteSeguridad(int sig){
