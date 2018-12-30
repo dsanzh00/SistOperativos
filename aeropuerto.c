@@ -140,8 +140,9 @@ void nuevoUsuario(int sig){
 		}
 		pthread_mutex_lock(&mEscritura);
 		char id[20];
-		sprintf(id, "El usuario %d entra en la cola %d", us[contUsuarios].id, us[contUsuarios].cola);
-		writeLogMessage(id);
+		sprintf(id, "El usuario %d ", us[contUsuarios].id);
+		sprintf(msg, "entra en la cola %d",us[contUsuarios].cola);
+		writeLogMessage(id, msg);
 		pthread_mutex_lock(&mEscritura);
 		// creación del hilo del usuario
 		pthread_create(&us[contUsuarios].usuario, NULL, accionesUsuario, NULL);
