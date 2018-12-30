@@ -407,7 +407,27 @@ void *accionesFacturador(void* numfact){
 
 
 		}
-		if(cont==4){
+		if(cont==5){
+
+			pthread_mutex_lock(&mEscritura);
+
+			char id[20];
+
+			sprintf(id, "el facturador de la cola %d ", facturadores);
+			writeLogMessage(id, "empieza su periodo de descanso");
+			pthread_mutex_unlock(&mEscritura);
+
+			sleep(10);
+
+			pthread_mutex_lock(&mEscritura);
+
+			char id2[20];
+
+			sprintf(id2, "el facturador de la cola %d ", facturadores);
+			writeLogMessage(id2, "Termina su periodo de descanso");
+			pthread_mutex_unlock(&mEscritura);
+			cont=0;
+		
 		
 		}
 
@@ -529,6 +549,8 @@ void inicializarUsuarios(){
 	//aqui falta algo
 
 }
+
+//hay que editar esta funcion
 void finPrograma(int sig){
 
 	if(signal(SIGINT, finPrograma)==SIG_ERR){
