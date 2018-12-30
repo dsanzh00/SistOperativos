@@ -29,7 +29,7 @@ void *accionesUsuario(void* posicion);
 void matamosHilo(int posicion);
 void control(int id);
 void *accionesFacturador(void* numfact);
-void accionesAgenteSeguridad(int sig);
+void accionesAgenteSeguridad(int usuario_id);
 void inicializaLog();
 void inicializaMutex();
 void inicializaGlobales();
@@ -61,10 +61,9 @@ char *logFileName="log.txt";
 //Mutex
 
 pthread_mutex_t mId;
-pthread_mutex_t mFacturado;
 pthread_mutex_t mEscritura;
 pthread_mutex_t mAtendido;
-pthread_mutex_t mTipo;
+
 
 struct usuario{
 
@@ -158,23 +157,6 @@ void nuevoUsuario(int sig){
 		pthread_create(&us[contUsuarios].usuario, NULL, accionesUsuario, NULL);
 	}
 
-
-/*
-1. Comprobar si hay espacio en la lista de facturación
-	Si lo hay:
-		Se añade el usuario, el contador aumenta
-		nuevoUsuario_Id = contadorUsuarios.
-		nuevoUsuario_atendido = 0;
-		tipo = normal(SIGUSR1) o VIP (SIGUSR2)
-		Creamos el hilo
-
-	Si NO lo hay:
-		Se ignora. 
-
-
-*/
-
-
 }
 
 void *accionesUsuario(void* posicion){
@@ -248,23 +230,6 @@ void *accionesUsuario(void* posicion){
 		/* Ha fallado el visado y te piras*/
 	}
 		matamosHilo(pos);
-	
-
-
-/*
-
-1. Guarda en el log la hora de entrada
-2. Guarda en el log el tipo de usuario
-3. Duerme 4 segundos
-	Comprueba si está siendo atendido
- 		Si NO está atendido, se mira si se pira (Hilo eliminar) 
- 			Se libera espacio de la cola
-		Se está atendido, espera a que termine.
-			puedes estar atendido y pasas a control. 
-				liberas cola del facturador
-			te puede joder el visado y que te piras. 
-
-*/
 
 }
 
@@ -298,6 +263,9 @@ void control(int id){
 	
 	/* Si no hay nadie en el control, entra */
 	if(controlSeguridad == 0){
+
+		accionesAgenteSeguridad(id);
+
 		controlSeguridad = 1;
 		idControl = id;
 	}else{
@@ -553,18 +521,14 @@ void inicializaMutex(){
 	if(pthread_mutex_init(&mId,NULL)!=0){
 		exit(-1);
 	}
-	if(pthread_mutex_init(&mFacturado,NULL)!=0){
-		exit(-1);
-	}
+	
 	if(pthread_mutex_init(&mEscritura,NULL)!=0){
 		exit(-1);
 	}
 	if(pthread_mutex_init(&mAtendido,NULL)!=0){
 		exit(-1);
 	}
-	if(pthread_mutex_init(&mTipo,NULL)!=0){
-		exit(-1);
-	}
+	
 }
 
 
