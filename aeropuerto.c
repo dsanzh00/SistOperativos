@@ -28,7 +28,8 @@ void inicializaGlobales();
 void inicializarUsuarios();
 void WriteLogMessage(char *id, char *msg);
 void finPrograma(int sig);
-void visadoincorrecto(int usuario_id);
+void Visado_Incorrecto(int usuario_id);
+void Exceso_Peso(int usuario_id);
 
 //Declaraciones globales
 int contUsuarios; 		// Numero de usuarios que han pasado
@@ -307,28 +308,72 @@ void *accionesFacturador(void* numfact){
 	pthread_mutex_unlock(&mEscritura);
 	while(admite==1){
 
+		if(aleatorio>=80 && aleatorio<90){
+
+			Exceso_Peso(int usuario_id);
+
+		}
+
+		if(aleatorio>=90){
+
+			Visado_Incorrecto(int usuario_id);
+
+
+		}
+
+
 	}
 }
 
-void visadoincorrecto(int usuario_id){
 
-		if(aleatorio>=90){
-			facturacion=2;
-			dormir=rand()%(10-6+1)+6;
-			sleep(dormir);//el usuario espera un 	aleatorio entre 6 y 10 
+void Exceso_Peso(int usuario_id){
 
-			//Registro en el log
-			pthread_mutex_lock(&mEscritura);
-			char id[30];
-			char msg[150];
-			sprintf(id, "Usuario %d ", usuario_id);
-			sprintf(msg, "No ha podido facturar por tener el visado incorrecto, y ha tardado %d segundos", dormir);
-			writeLogMessage(id, msg);
-			pthread_mutex_unlock(&mEscritura);
-			
-		}
+	facturacion=1;
+	dormir=rand()%6+2;
+	
+	sleep(dormir);
+
+	//Registro en el log
+	pthread_mutex_lock(&mEscritura);
+
+	char id[20];
+	char msg[120];
+
+	sprintf(id, "El usuario %d ", usuario_id);//inicializar variable usuario_id al principio de acciones tarima
+
+	sprintf(msg, "la facturacion ha sido invalida debido al exceso de peso y ha esperado %d segundos en la cola de facturacion.", dormir);
+
+	writeLogMessage(id, msg);
+
+	pthread_mutex_unlock(&mEscritura);
 
 }
+
+void Visado_Incorrecto(int usuario_id){
+
+		
+	facturacion=2;
+	dormir=rand()%(10-6+1)+6;
+
+	sleep(dormir);//el usuario espera un 	aleatorio entre 6 y 10 
+
+	//Registro en el log
+	pthread_mutex_lock(&mEscritura);
+
+	char id[30];
+	char msg[150];
+
+	sprintf(id, "Usuario %d ", usuario_id);
+
+	sprintf(msg, "No ha podido facturar por tener el visado incorrecto, y ha tardado %d segundos", dormir);
+
+	writeLogMessage(id, msg);
+
+	pthread_mutex_unlock(&mEscritura);
+				
+}
+
+
 
 void accionesAgenteSeguridad(int sig){
 
