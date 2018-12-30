@@ -196,8 +196,18 @@ void *accionesUsuario(void* posicion){
 			pthread_mutex_unlock(&mEscritura);
 			contUsuarios--;
 			matamosHilo(pos);
+		}else if((aleatorio>=10)&&(aleatorio<=30)){
+			pthread_mutex_lock(&mEscritura);
+			us[pos].atendido=2;
+			char id1[20];
+			char msg1[120];
+			sprintf(id1, "El usuario_%d ", id);
+			sprintf(msg1,"se va de la cola porque se ha cansado de esperar");
+			writeLogMessage(id1, msg1);
+			pthread_mutex_unlock(&mEscritura);
+			contUsuarios--;
+			matamosHilo(pos);
 		}else{	
-		
 			pthread_mutex_unlock(&mAtendido);
 			sleep(3);
 		}
@@ -227,8 +237,9 @@ void *accionesUsuario(void* posicion){
 		control(us[pos].id);
 	}else{
 		/* Ha fallado el visado y te piras*/
-		matamosHilo(pos);
 	}
+		matamosHilo(pos);
+	
 
 
 /*
@@ -296,7 +307,7 @@ void control(int id){
 void *accionesFacturador(void* numfact){
 
 	int facturadores = *(int *) numfact +1; //sirve para saber que facturador es
-	
+	int aleatorio;
 	int contador1 =0;
 	int contador2=0;
 
@@ -306,21 +317,99 @@ void *accionesFacturador(void* numfact){
 	sprintf(in, "%d", facturadores);
 	writeLogMessage("Se ha montado la mesa de facturacion %d", in);
 	pthread_mutex_unlock(&mEscritura);
+	int contador, cont, usuario_id;
 	while(admite==1){
+		libre=0;
+		//Bucle para la busqueda de un usuario que no este siendo atendido y este en la cola
+		while(libre==0){//Comienzo while2
+				pthread_mutex_lock(&mAtendido);
+				for(i=0;i<contUsuarios;i++){
+					if(libre==0){
+					//Comprobamos que el usuario exista
+						if(us[i].id!=0){
+							//Comprobamos que el usuario esta en la cola
+							if(us[i].facturado==0){
+								//Comprobamos si tiene asignada la cola asogmada y se esta ejecutando el hilo correcto
+								if(at[i].tipo==facturadores){
+									libre=1;//Indicamos que se ha encontrado un usuario que va a facturar
+									usuario_id=us[i].id;//Guardamos el id del usuarios que se dispone a facturar
+									us[i].facturado=1;//Actualizamos su estado a: facturando
+									cont++;//Aumentamos en 1 el contador que permitira al facturador descansar
+									pos=i;//guardamos la posicion en el array del usuario
+								}
+							}
 
-		if(aleatorio>=80 && aleatorio<90){
+						}
+					}
+				}
+				for(i=0;i<contUsuarios;i++){
+					if(libre==0){
+						if(us[i].id!=0){
+							if(at[i].facturado==0){
+								libre=1;
+								usuario_id=us[i].id;
+								us[i].tipo=facturadores;
+								us[i].facturado=1;
+								cont++;
+								pos=i;
+							}
 
-			Exceso_Peso(int usuario_id);
+						}					
+					}
+				}
+			if(sigint==(facturadores+1)){	
+			//Escribimos en el log la cantidad de usuarios que han pasado por cada mostrador
+			pthread_mutex_lock(&mEscritura);
+			char id6[30];
+			char msg6[100];
+			sprintf(id6, "El facturador %d",facturadores);
+			sprintf(msg6, " ha evaluado %d usuarios.", contador);
+			writeLogMessage(id6,msg6);
+			pthread_mutex_unlock(&mEscritura);
+			sigint++;
+			}
+			pthread_mutex_unlock(&Atendido);
+		}//final while2
+		pthread_mutex_lock(&mEscritura);
+		char id[20];
+		char msg[120];
+		sprintf(id, "El usuario %d ", usuario_id);
+		sprintf(msg, "entra a facturar en el mostrador %d.", facturadores);
+		writeLogMessage(id, msg);
+		pthread_mutex_unlock(&mEscritura);
+		sleep(4);
+		aleatorio=rand%100;
+		int dormir;
+		if(aleatorio<90){
+			if(aleatorio>=90){
 
+				Exceso_Peso(int usuario_id);
+			}
+			else{					
+				//facturacion=0;
+				dormir=rand()%(4-1+1)+2;
+				//Esperara entre 2 y 6s para realizarlo
+				sleep(dormir);
+				//Se le aplicara una puntuacion
+				pthread_mutex_lock(&mEscritura);
+				char id[20];
+				char msg[120];
+				sprintf(id, "El usuario %d ", usuario_id);
+				sprintf(msg, "ha tardado en facturar %d segundos.", dormir);
+				writeLogMessage(id, msg);
+				pthread_mutex_unlock(&mEscritura);
+			}
+			us[pos].facturado=1;
 		}
-
-		if(aleatorio>=90){
+		else if(aleatorio>=90){
 
 			Visado_Incorrecto(int usuario_id);
 
 
 		}
-
+		if(cont==4){
+		
+		}
 
 	}
 }
@@ -328,7 +417,7 @@ void *accionesFacturador(void* numfact){
 
 void Exceso_Peso(int usuario_id){
 
-	facturacion=1;
+	//facturacion=1;
 	dormir=rand()%6+2;
 	
 	sleep(dormir);
@@ -341,7 +430,7 @@ void Exceso_Peso(int usuario_id){
 
 	sprintf(id, "El usuario %d ", usuario_id);//inicializar variable usuario_id al principio de acciones tarima
 
-	sprintf(msg, "la facturacion ha sido invalida debido al exceso de peso y ha esperado %d segundos en la cola de facturacion.", dormir);
+	sprintf(msg, "la facturacion ha sido valida pero tiene exceso de peso porlo que ha estado %d segundos en la cola de facturacion.", dormir);
 
 	writeLogMessage(id, msg);
 
@@ -352,7 +441,7 @@ void Exceso_Peso(int usuario_id){
 void Visado_Incorrecto(int usuario_id){
 
 		
-	facturacion=2;
+	//facturacion=2;
 	dormir=rand()%(10-6+1)+6;
 
 	sleep(dormir);//el usuario espera un 	aleatorio entre 6 y 10 
