@@ -33,7 +33,7 @@ void accionesAgenteSeguridad(int sig);
 void inicializaLog();
 void inicializaMutex();
 void inicializaGlobales();
-void inicializarUsuarios();
+void inicializaUsuarios();
 void WriteLogMessage(char *id, char *msg);
 void finPrograma(int sig);
 void Visado_Incorrecto(int usuario_id);
