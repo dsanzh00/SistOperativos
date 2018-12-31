@@ -62,7 +62,8 @@ char *logFileName="log.txt";
 
 pthread_mutex_t mId;
 pthread_mutex_t mEscritura;
-pthread_mutex_t mAtendido;
+pthread_mutex_t mCola;
+pthread_mutex_t mControl;
 
 
 struct usuario{
@@ -83,14 +84,11 @@ struct usuario us [USUARIOS];
 
 int main(int argc, char *argv[]){
 	srand(time(NULL));
-	if(argc>2){
-		exit(0);
-	}
-	else{
+	
 		cabinasfact=2;
-		if(argc>1){
+		/*if(argc>1){
 			cabinasfact=atoi(argv[1]);
-		}
+		}*/
 		if(signal(SIGUSR1, nuevoUsuario) == SIG_ERR){//señal para un usuario no vip
 			perror("Error en el envio de la senial SIGUSR1");
 			exit(-1);
@@ -121,7 +119,7 @@ int main(int argc, char *argv[]){
 			pause();
 		}
 		return 0;
-	}
+	
 
 }
 
@@ -137,14 +135,24 @@ void nuevoUsuario(int sig){
 
 	if(contUsuarios<USUARIOS && sigint==0){
 
-		pthread_mutex_lock(&mAtendido);
+		pthread_mutex_lock(&mCola);
 		totalUsuarios++;
 		us[contUsuarios].id = totalUsuarios;
-		if(sig=SIGUSR1){
+		/*if(sig=SIGUSR1){
 			us[contUsuarios].cola = 1; //El usuario es asignado a la cola normal
 		}
 		else{
 			us[contUsuarios].cola = 2; //El usuario es asignado a la cola vip
+		}*/
+		switch(sig){
+			case SIGUSR1:
+				us[contUsuarios].cola = 1;
+				us[contUsuarios].tipo = 1;
+			break;
+			case SIGUSR2:
+				us[contUsuarios].cola = 2;
+				us[contUsuarios].tipo = 2;
+			break;
 		}
 		pthread_mutex_lock(&mEscritura);
 		char id[20];
@@ -152,7 +160,7 @@ void nuevoUsuario(int sig){
 		sprintf(id, "El usuario %d ", us[contUsuarios].id);
 		sprintf(msg, "entra en la cola %d",us[contUsuarios].cola);
 		writeLogMessage(id, msg);
-		pthread_mutex_lock(&mEscritura);
+		pthread_mutex_unlock(&mEscritura);
 		// creación del hilo del usuario
 		pthread_create(&us[contUsuarios].usuario, NULL, accionesUsuario, NULL);
 	}
@@ -187,6 +195,7 @@ void *accionesUsuario(void* posicion){
 			pthread_mutex_unlock(&mEscritura);
 			contUsuarios--;
 			matamosHilo(pos);
+
 		}else if((aleatorio>=10)&&(aleatorio<=30)){
 			pthread_mutex_lock(&mEscritura);
 			us[pos].atendido=2;
@@ -199,11 +208,11 @@ void *accionesUsuario(void* posicion){
 			contUsuarios--;
 			matamosHilo(pos);
 		}else{	
-			pthread_mutex_unlock(&mAtendido);
+			pthread_mutex_unlock(&mCola);
 			sleep(3);
 		}
 	
-	pthread_mutex_lock(&mAtendido);
+	pthread_mutex_lock(&mCola);
 	for(i=0; i<USUARIOS; i++){
 		if(us[i].id == id){
 			pos = i;
@@ -213,8 +222,8 @@ void *accionesUsuario(void* posicion){
 	} // Se acaba el while
 
 	while(us[pos].atendido == 1){
-		pthread_mutex_unlock(&mAtendido);
-		pthread_mutex_lock(&mAtendido);
+		pthread_mutex_unlock(&mCola);
+		pthread_mutex_lock(&mCola);
 	
 		for(i=0; i<USUARIOS; i++){
 			if(us[i].id == id){
@@ -253,21 +262,29 @@ void matamosHilo(int posicion){
 	us[USUARIOS-1].tipo = 0;	
 
 	totalAtendidos++;
-	pthread_mutex_unlock(&mAtendido);
+	pthread_mutex_unlock(&mCola);
 	pthread_exit(NULL);
 
 }
 
 void control(int id){
+	sleep(1);
 	int i;
 	
 	/* Si no hay nadie en el control, entra */
 	if(controlSeguridad == 0){
+		pthread_mutex_lock(&mEscritura);
+		char id[20];
+		char msg[200];//error
+		sprintf(id, "%d ", 2);
+		sprintf(msg, "hola");
+		writeLogMessage(id, msg);
+		pthread_mutex_unlock(&mEscritura);
 
-		accionesAgenteSeguridad(id);
+		/*accionesAgenteSeguridad(id);
 
 		controlSeguridad = 1;
-		idControl = id;
+		idControl = id;*/
 	}else{
 		/* Si el control está ocupado */
 		pthread_mutex_lock(&mEscritura);
@@ -283,7 +300,7 @@ void control(int id){
 
 void *accionesFacturador(void* numfact){
 
-	int facturadores = *(int *) numfact +1; //sirve para saber que facturador es
+	int facturadores = *(int *) numfact+1 ; //sirve para saber que facturador es
 	int aleatorio;
 	int contador1 =0;
 	int contador2=0;
@@ -295,26 +312,26 @@ void *accionesFacturador(void* numfact){
 
 	char in[10];
 	sprintf(in, "%d", facturadores);
-	writeLogMessage("Se ha montado la mesa de facturacion", in);
+	writeLogMessage("Se ha montado la mesa de facturacion ", in);
 	pthread_mutex_unlock(&mEscritura);
-	int contador, cont, usuario_id;
+	int usuario_id;
 	while(admite==1){
 		libre=0;
 		//Bucle para la busqueda de un usuario que no este siendo atendido y este en la cola
 		while(libre==0){//Comienzo while2
-				pthread_mutex_lock(&mAtendido);
+				pthread_mutex_lock(&mCola);
 				for(i=0;i<contUsuarios;i++){
 					if(libre==0){
 					//Comprobamos que el usuario exista
 						if(us[i].id!=0){
 							//Comprobamos que el usuario esta en la cola
-							if(us[i].facturado==0){
+							if(us[i].atendido==0){
 								//Comprobamos si tiene asignada la cola asogmada y se esta ejecutando el hilo correcto
 								if(us[i].tipo==facturadores){
 									libre=1;//Indicamos que se ha encontrado un usuario que va a facturar
 									usuario_id=us[i].id;//Guardamos el id del usuarios que se dispone a facturar
-									us[i].facturado=1;//Actualizamos su estado a: facturando
-									cont++;//Aumentamos en 1 el contador que permitira al facturador descansar
+									us[i].atendido=1;//Actualizamos su estado a: facturando
+									contador1++;//Aumentamos en 1 el contador que permitira al facturador descansar
 									pos=i;//guardamos la posicion en el array del usuario
 								}
 							}
@@ -325,12 +342,12 @@ void *accionesFacturador(void* numfact){
 				for(i=0;i<contUsuarios;i++){
 					if(libre==0){
 						if(us[i].id!=0){
-							if(us[i].facturado==0){
+							if(us[i].atendido==0){
 								libre=1;
 								usuario_id=us[i].id;
 								us[i].tipo=facturadores;
-								us[i].facturado=1;
-								cont++;
+								us[i].atendido=1;
+								contador1++;
 								pos=i;
 							}
 
@@ -343,13 +360,17 @@ void *accionesFacturador(void* numfact){
 			char id6[30];
 			char msg6[100];
 			sprintf(id6, "El facturador %d",facturadores);
-			sprintf(msg6, " ha evaluado %d usuarios.", contador);
+			sprintf(msg6, " ha evaluado %d usuarios.", contador2);
 			writeLogMessage(id6,msg6);
 			pthread_mutex_unlock(&mEscritura);
 			sigint++;
 			}
-			pthread_mutex_unlock(&mAtendido);//error
+			pthread_mutex_unlock(&mCola);//error
 		}//final while2
+		sleep(4);
+		aleatorio=rand()%100;
+		int dormir;
+		if(aleatorio<90){
 		pthread_mutex_lock(&mEscritura);
 		char id[20];
 		char msg[120];
@@ -357,11 +378,7 @@ void *accionesFacturador(void* numfact){
 		sprintf(msg, "entra a facturar en el mostrador %d.", facturadores);
 		writeLogMessage(id, msg);
 		pthread_mutex_unlock(&mEscritura);
-		sleep(4);
-		aleatorio=rand()%100;
-		int dormir;
-		if(aleatorio<90){
-			if(aleatorio>=90){
+			if(aleatorio>=80){
 
 				Exceso_Peso(usuario_id);//error
 			}
@@ -379,15 +396,52 @@ void *accionesFacturador(void* numfact){
 				writeLogMessage(id, msg);
 				pthread_mutex_unlock(&mEscritura);
 			}
+			pthread_mutex_lock(&mCola);
+			for(i=0;i<USUARIOS;i++) if(us[i].id==usuario_id) pos=i;
+			contUsuarios--;
+				/*us[pos].facturado=1;
+				//Reflejamos la accion de beber agua en el log
+				pthread_mutex_lock(&mEscritura);
+				char a[100];
+				sprintf(a, "El usuario %d", usuario_id);
+				writeLogMessage(a,"Ha sido enviado a seguridad.");
+				pthread_mutex_unlock(&mEscritura);
+			pthread_mutex_unlock(&mCola);*/
+			//añadimos un competidor a los evaluados por el juez;
+			
 			us[pos].facturado=1;
+			//Reflejamos la accion de beber agua en el log
+			pthread_mutex_lock(&mEscritura);
+			char a[100];
+			sprintf(a, "El usuario %d",usuario_id);
+			writeLogMessage(a,"Ha sido mandado a seguridad.");
+			pthread_mutex_unlock(&mEscritura);
+			pthread_mutex_unlock(&mCola);
 		}
 		else if(aleatorio>=90){
+		pthread_mutex_lock(&mEscritura);
+		char id[20];
+		char msg[120];
+		sprintf(id, "El usuario %d ", usuario_id);
+		sprintf(msg, "entra a facturar en el mostrador %d.", facturadores);
+		writeLogMessage(id, msg);
+		pthread_mutex_unlock(&mEscritura);
 
 			Visado_Incorrecto(usuario_id);//error
-
+			
 
 		}
-		if(cont==5){
+		pthread_mutex_lock(&mCola);
+		for(i=0;i<USUARIOS;i++) if(us[i].id==usuario_id) pos=i;
+		us[pos].atendido=2;
+		contUsuarios--;//Deja su sitio en la cola
+		//Cuando ha realizado el levantamiento comprobara si el juez le manda beber agua
+		if(aleatorio<90){
+		}
+		pthread_mutex_unlock(&mCola);
+		//añadimos un competidor a los evaluados por el juez;
+		contador2++;
+		if(contador1==5){
 
 			pthread_mutex_lock(&mEscritura);
 
@@ -406,7 +460,7 @@ void *accionesFacturador(void* numfact){
 			sprintf(id2, "el facturador de la cola %d ", facturadores);
 			writeLogMessage(id2, "Termina su periodo de descanso");
 			pthread_mutex_unlock(&mEscritura);
-			cont=0;
+			contador1=0;
 		
 		
 		}
@@ -430,7 +484,7 @@ void Exceso_Peso(int usuario_id){
 	char id[20];
 	char msg[120];
 
-	sprintf(id, "El usuario %d ", usuario_id);//inicializar variable usuario_id al principio de acciones tarima
+	sprintf(id, "El usuario %d ", usuario_id);//inicializar variable usuario_id al principio de acciones facturador
 
 	sprintf(msg, "la facturacion ha sido valida pero tiene exceso de peso porlo que ha estado %d segundos en la cola de facturacion.", dormir);
 
@@ -525,7 +579,11 @@ void inicializaMutex(){
 	if(pthread_mutex_init(&mEscritura,NULL)!=0){
 		exit(-1);
 	}
-	if(pthread_mutex_init(&mAtendido,NULL)!=0){
+	if(pthread_mutex_init(&mCola,NULL)!=0){
+		exit(-1);
+	}
+	
+	if(pthread_mutex_init(&mControl,NULL)!=0){
 		exit(-1);
 	}
 	
@@ -577,5 +635,8 @@ void finPrograma(int sig){
 		exit(-1);		
 	
 	}	
-
+	pthread_mutex_lock(&mEscritura);
+	writeLogMessage("Sistema", "Log finalizado.");
+	pthread_mutex_unlock(&mEscritura);
+	exit(0);
 }
