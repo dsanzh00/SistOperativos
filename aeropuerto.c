@@ -588,7 +588,7 @@ void WriteLogMessage(char *id, char *msg){
 	fclose(logFile);
 
 }
-void inicializarUsuarios(){
+void inicializaUsuarios(){
 	int i;
 	for(i=0;i<USUARIOS;i++){
 		us[i].id=0;
