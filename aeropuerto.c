@@ -472,7 +472,7 @@ void Visado_Incorrecto(int usuario_id){
 	char id[30];
 	char msg[150];
 
-	sprintf(id, "Usuario %d ", usuario_id);
+	sprintf(id, "Usuario_%d ", usuario_id);
 
 	sprintf(msg, "No ha podido facturar por tener el visado incorrecto, y ha tardado %d segundos", dormir);
 
@@ -486,6 +486,42 @@ void Visado_Incorrecto(int usuario_id){
 
 void accionesAgenteSeguridad(int sig){
 
+	int esperar, esperar1, inspeccion;
+	inspeccion = rand()%100	//No estoy seguro de si %100 o %10
+	
+	if(inspecion < 60){
+		pthread_mutex_lock(&mEscritura);
+		char p[20];
+		char m[200];
+
+		esperar = rand()%(3-2+1)+2
+		sleep(esperar);
+		
+		sprintf(p, "Usuario_%d ", usuario_id);
+		
+		sprintf(m, "va a embarcar tras tardar %d segundos", esperar);
+
+		writeLogMessage(p,m);
+
+		pthread_mutex_unlock(&mEscritura);
+
+	}else{
+		pthread_mutex_lock(&mEscritura);
+		char p1[20];
+		char m1[200];
+
+		esperar1 = rand()%(15-10+1)+10
+		sleep(esperar1);
+		
+		sprintf(p1, "Usuario_%d ", usuario_id);
+		
+		sprintf(m1, "ha sido inspeccionado por lo que ha tardado %d segundos", esperar1);
+
+		writeLogMessage(p1,m1);
+
+		pthread_mutex_unlock(&mEscritura);
+
+	}
 }
 
 void inicializaLog(){
