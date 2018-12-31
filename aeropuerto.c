@@ -1,6 +1,8 @@
 /*
 
-		PRACTICA FINAL SISTEMAS OPERATIVOS GRUPO 40
+		PRACTICA FINAL 
+		SISTEMAS OPERATIVOS 
+		GRUPO 40
 
 */
 
@@ -19,7 +21,7 @@
 #include<ctype.h>
 #include<string.h>
 #define USUARIOS 10
-#define COLA 1
+#define COLA 2
 //#include<pthreads.h>
 
 void nuevoUsuario(int sig);
