@@ -556,6 +556,9 @@ void inicializaMutex(){
 	if(pthread_mutex_init(&mFacturado,NULL)!=0){
 		exit(-1);
 	}
+	if(pthread_mutex_init(&mEscritura,NULL)!=0){
+		exit(-1);
+	}
 	if(pthread_mutex_init(&mAtendido,NULL)!=0){
 		exit(-1);
 	}
