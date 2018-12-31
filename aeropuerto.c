@@ -327,7 +327,7 @@ void *accionesFacturador(void* numfact){
 
 	char in[10];
 	sprintf(in, "%d", facturadores);
-	writeLogMessage("Se ha montado la mesa de facturacion %d", in);
+	writeLogMessage("Se ha montado la mesa de facturacion", in);
 	pthread_mutex_unlock(&mEscritura);
 	int contador, cont, usuario_id;
 	while(admite==1){
