@@ -382,7 +382,7 @@ void *accionesFacturador(void* numfact){
 		writeLogMessage(id, msg);
 		pthread_mutex_unlock(&mEscritura);
 		sleep(4);
-		aleatorio=rand%100;
+		aleatorio=rand()%100;
 		int dormir;
 		if(aleatorio<90){
 			if(aleatorio>=90){
@@ -491,12 +491,12 @@ void Visado_Incorrecto(int usuario_id){
 
 
 
-void accionesAgenteSeguridad(int sig){
+void accionesAgenteSeguridad(int usuario_id){
 
 	int esperar, esperar1, inspeccion;
 	inspeccion = rand()%100;	//No estoy seguro de si %100 o %10
 	
-	if(inspecion < 60){
+	if(inspeccion < 60){
 		pthread_mutex_lock(&mEscritura);
 		char p[20];
 		char m[200];
