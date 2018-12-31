@@ -349,7 +349,7 @@ void *accionesFacturador(void* numfact){
 				for(i=0;i<contUsuarios;i++){
 					if(libre==0){
 						if(us[i].id!=0){
-							if(at[i].facturado==0){
+							if(us[i].facturado==0){
 								libre=1;
 								usuario_id=us[i].id;
 								us[i].tipo=facturadores;
@@ -387,7 +387,7 @@ void *accionesFacturador(void* numfact){
 		if(aleatorio<90){
 			if(aleatorio>=90){
 
-				Exceso_Peso(int usuario_id);
+				Exceso_Peso(usuario_id);//error
 			}
 			else{					
 				//facturacion=0;
@@ -407,7 +407,7 @@ void *accionesFacturador(void* numfact){
 		}
 		else if(aleatorio>=90){
 
-			Visado_Incorrecto(int usuario_id);
+			Visado_Incorrecto(usuario_id);//error
 
 
 		}
@@ -441,6 +441,8 @@ void *accionesFacturador(void* numfact){
 
 void Exceso_Peso(int usuario_id){
 
+	int dormir;
+
 	//facturacion=1;
 	dormir=rand()%6+2;
 	
@@ -464,7 +466,8 @@ void Exceso_Peso(int usuario_id){
 
 void Visado_Incorrecto(int usuario_id){
 
-		
+	int dormir;	
+	
 	//facturacion=2;
 	dormir=rand()%(10-6+1)+6;
 
@@ -491,7 +494,7 @@ void Visado_Incorrecto(int usuario_id){
 void accionesAgenteSeguridad(int sig){
 
 	int esperar, esperar1, inspeccion;
-	inspeccion = rand()%100	//No estoy seguro de si %100 o %10
+	inspeccion = rand()%100;	//No estoy seguro de si %100 o %10
 	
 	if(inspecion < 60){
 		pthread_mutex_lock(&mEscritura);
