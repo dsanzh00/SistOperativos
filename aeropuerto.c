@@ -141,6 +141,7 @@ void nuevoUsuario(int sig){
 		}
 		pthread_mutex_lock(&mEscritura);
 		char id[20];
+		char msg[200];//error
 		sprintf(id, "El usuario %d ", us[contUsuarios].id);
 		sprintf(msg, "entra en la cola %d",us[contUsuarios].cola);
 		writeLogMessage(id, msg);
@@ -310,6 +311,9 @@ void *accionesFacturador(void* numfact){
 	int aleatorio;
 	int contador1 =0;
 	int contador2=0;
+	int libre;
+	int i;//error
+	int pos;//error
 
 	pthread_mutex_lock(&mEscritura);
 
@@ -330,7 +334,7 @@ void *accionesFacturador(void* numfact){
 							//Comprobamos que el usuario esta en la cola
 							if(us[i].facturado==0){
 								//Comprobamos si tiene asignada la cola asogmada y se esta ejecutando el hilo correcto
-								if(at[i].tipo==facturadores){
+								if(us[i].tipo==facturadores){
 									libre=1;//Indicamos que se ha encontrado un usuario que va a facturar
 									usuario_id=us[i].id;//Guardamos el id del usuarios que se dispone a facturar
 									us[i].facturado=1;//Actualizamos su estado a: facturando
@@ -368,7 +372,7 @@ void *accionesFacturador(void* numfact){
 			pthread_mutex_unlock(&mEscritura);
 			sigint++;
 			}
-			pthread_mutex_unlock(&Atendido);
+			pthread_mutex_unlock(&mAtendido);//error
 		}//final while2
 		pthread_mutex_lock(&mEscritura);
 		char id[20];
@@ -387,10 +391,10 @@ void *accionesFacturador(void* numfact){
 			}
 			else{					
 				//facturacion=0;
-				dormir=rand()%(4-1+1)+2;
+				dormir=rand()%(6-2+1)+2;//error
 				//Esperara entre 2 y 6s para realizarlo
 				sleep(dormir);
-				//Se le aplicara una puntuacion
+
 				pthread_mutex_lock(&mEscritura);
 				char id[20];
 				char msg[120];
@@ -494,7 +498,7 @@ void accionesAgenteSeguridad(int sig){
 		char p[20];
 		char m[200];
 
-		esperar = rand()%(3-2+1)+2
+		esperar = rand()%(3-2+1)+2;
 		sleep(esperar);
 		
 		sprintf(p, "Usuario_%d ", usuario_id);
@@ -510,7 +514,7 @@ void accionesAgenteSeguridad(int sig){
 		char p1[20];
 		char m1[200];
 
-		esperar1 = rand()%(15-10+1)+10
+		esperar1 = rand()%(15-10+1)+10;
 		sleep(esperar1);
 		
 		sprintf(p1, "Usuario_%d ", usuario_id);
