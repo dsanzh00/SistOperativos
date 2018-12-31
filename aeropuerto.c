@@ -577,7 +577,7 @@ void inicializaGlobales(){
 	totalEmbarcados=0;
 
 }
-void WriteLogMessage(char *id, char *msg){
+void writeLogMessage(char *id, char *msg){
 
 	time_t now =time(0);
 	struct tm *tlocal = localtime(&now);
