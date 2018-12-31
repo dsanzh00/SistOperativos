@@ -513,7 +513,7 @@ void inicializaLog(){
 	
 	fclose(logFile);
 
-	writeLogMessage("Sistema", "Log iniciado.");
+	writeLogMessage("Sistema", "Log iniciado.\nBienvenidos al aeropuerto nacional catalan Carles Puigdemont");
 
 }
 void inicializaMutex(){
