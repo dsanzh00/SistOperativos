@@ -423,7 +423,7 @@ void *accionesFacturador(void* numfact){
 
 			pthread_mutex_lock(&mEscritura);
 
-			char id[20];
+			char id[50];
 
 			sprintf(id, "el facturador de la cola %d ", facturadores);
 			writeLogMessage(id, "empieza su periodo de descanso");
@@ -433,7 +433,7 @@ void *accionesFacturador(void* numfact){
 
 			pthread_mutex_lock(&mEscritura);
 
-			char id2[20];
+			char id2[50];
 
 			sprintf(id2, "el facturador de la cola %d ", facturadores);
 			writeLogMessage(id2, "Termina su periodo de descanso");
