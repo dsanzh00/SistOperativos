@@ -88,9 +88,7 @@ int main(int argc, char *argv[]){
 	srand(time(NULL));
 	
 		cabinasfact=2;
-		/*if(argc>1){
-			cabinasfact=atoi(argv[1]);
-		}*/
+
 		if(signal(SIGUSR1, nuevoUsuario) == SIG_ERR){//senial para un usuario no vip: kill -s 10 (pid del programa)
 			perror("Error en el envio de la senial SIGUSR1");
 			exit(-1);
@@ -153,8 +151,8 @@ void nuevoUsuario(int sig){
 		pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 		char id[20];
 		char msg[200];
-		sprintf(id, "El usuario %d ", us[contUsuarios].id);
-		sprintf(msg, "entra en la cola %d",us[contUsuarios].cola);
+		sprintf(id, "El usuario_%d ", us[contUsuarios].id);
+		sprintf(msg, "Entra en la cola %d",us[contUsuarios].cola);
 		writeLogMessage(id, msg);
 		pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 		// creación del hilo del usuario
@@ -178,15 +176,14 @@ void *accionesUsuario(void* posicion){
 
 		if(aleatorio  < 10){ //El 10% se van de la cola porque van al banio
 	
-		/* Si el numero pertenece al 10% ese usuario abandona la cola porque se va al banio y lo registramos en el log */
-		/* ¿Habrá que repetir para los que se cansan? */	
+		/* Si el numero pertenece al 10% ese usuario abandona la cola porque se va al banio y lo registramos en el log */	
 			
 			pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 			us[pos].atendido = 2;
 			char id1[20];
 			char msg1[200];
 			sprintf(id1, "El usuario_%d ", id);
-			sprintf(msg1, "se va de la cola porque necesita ir al banio");
+			sprintf(msg1, "Se va de la cola porque necesita ir al banio");
 			writeLogMessage(id1, msg1);
 			pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 			contUsuarios--;
@@ -198,7 +195,7 @@ void *accionesUsuario(void* posicion){
 			char id1[20];
 			char msg1[120];
 			sprintf(id1, "El usuario_%d ", id);
-			sprintf(msg1,"se va de la cola porque se ha cansado de esperar");
+			sprintf(msg1,"Se va de la cola porque se ha cansado de esperar");
 			writeLogMessage(id1, msg1);
 			pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 			contUsuarios--;
@@ -305,7 +302,7 @@ void control(int id){
 		char a[100];
 		char msg[200];
 		sprintf(a, "El usuario_%d ", id);
-		sprintf(msg, "esta esperando a que para el control de seguridad");
+		sprintf(msg, "Esta esperando a que pare el control de seguridad");
 		writeLogMessage(a, msg);
 		pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 		idControl = id;
@@ -380,8 +377,8 @@ void *accionesFacturador(void* numfact){
 		pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 		char id[20];
 		char msg[120];
-		sprintf(id, "El usuario %d ", usuario_id);
-		sprintf(msg, "entra a facturar en el mostrador %d.", facturadores); //Le asignamos al usuario un mostrador
+		sprintf(id, "El usuario_%d ", usuario_id);
+		sprintf(msg, "Entra a facturar en el mostrador %d.", facturadores); //Le asignamos al usuario un mostrador
 		writeLogMessage(id, msg);
 		pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 			if(aleatorio>=80){ //Del 90% de los usuarios que pasan el control, el 10% tiene exceso de equipaje
@@ -396,8 +393,8 @@ void *accionesFacturador(void* numfact){
 				pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 				char id[20];
 				char msg[120];
-				sprintf(id, "El usuario %d ", usuario_id);
-				sprintf(msg, "ha tardado en facturar %d segundos.", dormir);
+				sprintf(id, "El usuario_%d ", usuario_id);
+				sprintf(msg, "Ha tardado en facturar %d segundos.", dormir);
 				writeLogMessage(id, msg);
 				pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 			}
@@ -406,8 +403,8 @@ void *accionesFacturador(void* numfact){
 		pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 		char id[20];
 		char msg[120];
-		sprintf(id, "El usuario %d ", usuario_id);
-		sprintf(msg, "entra a facturar en el mostrador %d.", facturadores);
+		sprintf(id, "El usuario_%d ", usuario_id);
+		sprintf(msg, "Entra a facturar en el mostrador %d.", facturadores);
 		writeLogMessage(id, msg);
 		pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 
@@ -425,7 +422,7 @@ void *accionesFacturador(void* numfact){
 			//Reflejamos la accion de ir a seguridad agua en el log
 			pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 			char a[100];
-			sprintf(a, "El usuario %d", usuario_id);
+			sprintf(a, "El usuario_%d ", usuario_id);
 			writeLogMessage(a,"Ha sido mandado a seguridad.");
 			pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 		}
@@ -443,8 +440,8 @@ void *accionesFacturador(void* numfact){
 
 			char id[50];
 
-			sprintf(id, "el facturador de la cola %d ", facturadores);
-			writeLogMessage(id, "empieza su periodo de descanso");
+			sprintf(id, "El facturador de la cola %d ", facturadores);
+			writeLogMessage(id, "Empieza su periodo de descanso");
 			pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 
 			sleep(10);
@@ -453,7 +450,7 @@ void *accionesFacturador(void* numfact){
 
 			char id2[50];
 
-			sprintf(id2, "el facturador de la cola %d ", facturadores);
+			sprintf(id2, "El facturador de la cola %d ", facturadores);
 			writeLogMessage(id2, "Termina su periodo de descanso");
 			pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 			contador1=0;
@@ -478,9 +475,9 @@ void Exceso_Peso(int usuario_id){
 	char id[20];
 	char msg[120];
 
-	sprintf(id, "El usuario %d ", usuario_id);//inicializar variable usuario_id al principio de acciones facturador
+	sprintf(id, "El usuario_%d ", usuario_id);//inicializar variable usuario_id al principio de acciones facturador
 
-	sprintf(msg, "la facturacion ha sido valida pero tiene exceso de peso porlo que ha estado %d segundos en la cola de facturacion.", dormir);
+	sprintf(msg, "Ha tenido una facturacion valida pero tiene exceso de peso porlo que ha estado %d segundos en la cola de facturacion.", dormir);
 
 	writeLogMessage(id, msg);
 
@@ -502,7 +499,7 @@ void Visado_Incorrecto(int usuario_id){
 	char id[30];
 	char msg[150];
 
-	sprintf(id, "Usuario_%d ", usuario_id);
+	sprintf(id, "El usuario_%d ", usuario_id);
 
 	sprintf(msg, "No ha podido facturar por tener el visado incorrecto, y ha tardado %d segundos", dormir);
 
@@ -528,9 +525,9 @@ void accionesAgenteSeguridad(int usuario_id){
 		esperar = rand()%(3-2+1)+2;
 		sleep(esperar);
 		
-		sprintf(p, "Usuario_%d ", usuario_id);
+		sprintf(p, "El usuario_%d ", usuario_id);
 		
-		sprintf(m, "va a embarcar tras tardar %d segundos", esperar);
+		sprintf(m, "Va a embarcar tras tardar %d segundos", esperar);
 
 		writeLogMessage(p,m);
 
@@ -545,9 +542,9 @@ void accionesAgenteSeguridad(int usuario_id){
 		esperar1 = rand()%(15-10+1)+10;
 		sleep(esperar1);
 		
-		sprintf(p1, "Usuario_%d ", usuario_id);
+		sprintf(p1, "El usuario_%d ", usuario_id);
 		
-		sprintf(m1, "ha sido inspeccionado por lo que ha tardado %d segundos y no ha podido embarcar", esperar1);
+		sprintf(m1, "Ha sido inspeccionado por lo que ha tardado %d segundos y no ha podido embarcar", esperar1);
 
 		writeLogMessage(p1,m1);
 
@@ -568,7 +565,7 @@ void inicializaLog(){
 	
 	fclose(logFile);
 
-	writeLogMessage("Sistema", "Log iniciado.\nBienvenidos al aeropuerto nacional catalan Carles Puigdemont");
+	writeLogMessage("Sistema", "Log iniciado.\n\nBienvenidos al aeropuerto nacional catalan Carles Puigdemont\n\n");
 
 }
 void inicializaMutex(){
@@ -639,12 +636,12 @@ void finPrograma(int sig){
 	}
 	pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 	char msg1[100];
-	sprintf(msg1,"El facturador1 ha atendido a: %d usuarios\nEl facturador2 ha atendido a: %d usuarios", atendidos1, atendidos2);
+	sprintf(msg1,"\n\nEl facturador_1 ha atendido a: %d usuarios\nEl facturador_2 ha atendido a: %d usuarios\n", atendidos1, atendidos2);
 	writeLogMessage("Sistema", msg1);
 	pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log	
 	pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 	char msg[100];
-	sprintf(msg,"Log finalizado.\nEl numero de pasajeros embarcados es de: %d", totalEmbarcados);
+	sprintf(msg,"Log finalizado.\n\nEl numero de pasajeros embarcados es de: %d", totalEmbarcados);
 	writeLogMessage("Sistema", msg);
 	pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 	exit(0);
