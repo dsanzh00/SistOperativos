@@ -333,6 +333,8 @@ void *accionesFacturador(void* numfact){
 		//Bucle para la busqueda de un usuario que no este siendo atendido y este en la cola
 		while(libre==0){//Comienzo while2
 				pthread_mutex_lock(&mCola); //Abrimos la cola
+				
+
 				for(i=0;i<contUsuarios;i++){
 					if(libre==0){
 					//Comprobamos que el usuario exista
@@ -351,7 +353,11 @@ void *accionesFacturador(void* numfact){
 
 						}
 					}
+
 				}
+
+				sleep(1);
+
 				for(i=0;i<contUsuarios;i++){
 					if(libre==0){
 					//Comprobamos que el usuario exista
