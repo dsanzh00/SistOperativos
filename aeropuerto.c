@@ -80,7 +80,7 @@ struct usuario{
 
 };
 
-//Array de los atletas
+//Array de los usuarios
 struct usuario us [USUARIOS];
 
 
@@ -176,7 +176,7 @@ void *accionesUsuario(void* posicion){
 
 		if(aleatorio  < 10){ //El 10% se van de la cola porque van al banio
 	
-		/* Si el numero pertenece al 10% ese usuario abandona la cola porque se va al banio y lo registramos en el log */	
+		// Si el numero pertenece al 10% ese usuario abandona la cola porque se va al banio y lo registramos en el log 
 			
 			pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 			us[pos].atendido = 2;
@@ -188,6 +188,8 @@ void *accionesUsuario(void* posicion){
 			pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 			contUsuarios--;
 			matamosHilo(pos); //Matamos el hilo
+
+		//Si el numero esta entre el 10 y el 30 ese usuario abandona la cola porque se cansa de esperar lo registramos en el log 
 
 		}else if((aleatorio>=10)&&(aleatorio<=30)){
 			pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
@@ -337,7 +339,7 @@ void *accionesFacturador(void* numfact){
 						if(us[i].id!=0){
 					//Comprobamos que el usuario exista
 							if(us[i].atendido==0){
-								//Comprobamos si tiene asignada la cola asogmada y se esta ejecutando el hilo correcto
+								//Comprobamos si tiene asignada la cola asignada y se esta ejecutando el hilo correcto
 								if(us[i].cola==facturadores){
 									libre=1; //Indicamos que se ha encontrado un usuario que va a facturar
 									usuario_id=us[i].id; //Guardamos el id del usuarios que se dispone a facturar
@@ -408,7 +410,7 @@ void *accionesFacturador(void* numfact){
 		writeLogMessage(id, msg);
 		pthread_mutex_unlock(&mEscritura); //Cerramos la escritura del log
 
-			Visado_Incorrecto(usuario_id); //Vamos a la funcion Visado_Incorresto para que quede mas claro
+			Visado_Incorrecto(usuario_id); //Vamos a la funcion Visado_Incorrecto para que quede mas claro
 			
 	
 		}
@@ -419,7 +421,7 @@ void *accionesFacturador(void* numfact){
 		if(aleatorio<90){ //Los que han pasado la facturacion
 			//Cuando ha realizado la facturacion va a seguridad
 			us[pos].facturado=1; //Su estado de facturacion pasa a: facturado
-			//Reflejamos la accion de ir a seguridad agua en el log
+			//Reflejamos la accion de ir a seguridad se guarda  en el log
 			pthread_mutex_lock(&mEscritura); //Abrimos la escritura del log
 			char a[100];
 			sprintf(a, "El usuario_%d ", usuario_id);
